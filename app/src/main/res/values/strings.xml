@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AlbumViewer</string>
+    <string name="retry">Retry</string>
+    <string name="try_again">Try Again</string>
+    <string name="fetching">Fetching…</string>
+    <string name="search">Search...</string>
+</resources>
