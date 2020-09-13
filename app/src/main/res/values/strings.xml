@@ -4,4 +4,6 @@
     <string name="try_again">Try Again</string>
     <string name="fetching">Fetching…</string>
     <string name="search">Search...</string>
+    <string name="search_close">search_close</string>
+    <string name="search_open">search_open</string>
 </resources>

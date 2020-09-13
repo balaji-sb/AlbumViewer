@@ -3,8 +3,10 @@ package com.pb.albumviewer.view.activity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import com.pb.albumviewer.R
 import com.pb.albumviewer.base.BaseActivity
+import com.pb.albumviewer.utils.PackageUtils
 import com.pb.albumviewer.view.fragment.AlbumsFragment
 import com.pb.albumviewer.view.fragment.SplashFragment
 import kotlinx.android.synthetic.main.activity_home.*
@@ -26,11 +28,20 @@ class HomeActivity : BaseActivity(), TextWatcher {
     }
 
     override fun initValues() {
+        searchImg.contentDescription = getString(R.string.search_close)
         searchImg.setOnClickListener(this)
         searchEdt.addTextChangedListener(this)
     }
 
     override fun setupViews() {
+        searchEdt.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                PackageUtils.hideKeyboard(this)
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+
         val splashFragment = SplashFragment()
         navigateFragment(splashFragment)
     }
@@ -46,7 +57,17 @@ class HomeActivity : BaseActivity(), TextWatcher {
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.searchImg -> {
-                searchEdt.visibility = View.VISIBLE
+                if(searchImg.contentDescription ==  getString(R.string.search_open)){
+                    searchEdt.visibility=View.GONE
+                    searchImg.setImageResource(R.drawable.ic_baseline_search_24)
+                    searchImg.contentDescription = getString(R.string.search_close)
+                    callSearch("")
+                }else{
+                    searchEdt.visibility = View.VISIBLE
+                    searchImg.setImageResource(R.drawable.ic_baseline_close_24)
+                    searchImg.contentDescription = getString(R.string.search_open)
+                }
+
             }
         }
     }
@@ -61,10 +82,14 @@ class HomeActivity : BaseActivity(), TextWatcher {
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         p0?.let {
-            val currentFragment = getCurrentFragment()
-            if (currentFragment is AlbumsFragment) {
-                currentFragment.searchItem(it.toString())
-            }
+            callSearch(it)
+        }
+    }
+
+    private fun callSearch(it: CharSequence) {
+        val currentFragment = getCurrentFragment()
+        if (currentFragment is AlbumsFragment) {
+            currentFragment.searchItem(it.toString())
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.pb.albumviewer.db
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -23,8 +21,5 @@ interface AlbumsDao {
 
     @Query("SELECT count(*) FROM albums")
     suspend fun getAlbumsCount(): Int
-
-    @Query("SELECT * FROM albums WHERE album_title like :searchValue")
-    suspend fun searchFromAlbum(searchValue:String): List<Albums>
 
 }

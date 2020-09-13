@@ -10,7 +10,6 @@ import com.pb.albumviewer.R
 import com.pb.albumviewer.base.BaseFragment
 import com.pb.albumviewer.model.response.Photos
 import com.pb.albumviewer.utils.Const
-import com.pb.albumviewer.view.adapter.AlbumsAdapter
 import com.pb.albumviewer.view.adapter.PhotosAdapter
 import com.pb.albumviewer.viewmodel.PhotosViewModel
 import kotlinx.android.synthetic.main.fragment_albums.*

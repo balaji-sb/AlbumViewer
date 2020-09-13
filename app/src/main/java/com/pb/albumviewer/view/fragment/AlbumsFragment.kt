@@ -2,6 +2,7 @@ package com.pb.albumviewer.view.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -27,6 +28,7 @@ class AlbumsFragment : BaseFragment(), OnItemClickedListener, SwipeRefreshLayout
     private lateinit var mAlbumsViewModel: AlbumsViewModel
     private var mAlbumsAdapter: AlbumsAdapter? = null
     private var mGridLayoutManager: GridLayoutManager? = null
+    private var mAlbumsList: List<Albums> = arrayListOf<Albums>()
 
     override fun getLayoutResource(): Int {
         return R.layout.fragment_albums
@@ -69,21 +71,49 @@ class AlbumsFragment : BaseFragment(), OnItemClickedListener, SwipeRefreshLayout
     private fun fetchAlbums() {
         if (!albumPhotoSwipeRefresh.isRefreshing)
             showProgressBar(true)
-        mAlbumsViewModel.fetchAlbums().observe(this, albumsObserver)
+        mAlbumsViewModel.fetchAlbums()
+        mAlbumsViewModel.getAlbums()?.observe(this, albumsObserver)
     }
 
     private val albumsObserver = Observer<List<Albums>> { albumsList ->
         albumsList?.apply {
+            mAlbumsList = this
             if (this.isNotEmpty()) {
                 showProgressBar(false)
                 albumPhotoSwipeRefresh.isRefreshing = false
-                mAlbumsAdapter?.setAlbums(albumsList)
+                updateAdapter(mAlbumsList)
             }
         }
     }
 
-    fun searchItem(searchValue: String) =
-        mAlbumsViewModel.searchItem(searchValue).observe(this, albumsObserver)
+    fun searchItem(searchValue: String) {
+        if (mAlbumsList.isEmpty() || searchValue.isEmpty()) {
+            updateAdapter(mAlbumsList)
+        } else {
+            val tempList = arrayListOf<Albums>()
+            mAlbumsList.forEach {
+                if (it.album_title.contains(searchValue)) {
+                    tempList.add(it)
+                }
+            }
+            updateAdapter(tempList)
+        }
+    }
+
+    private fun updateAdapter(albumList: List<Albums>) {
+        val albumPhotoRecyclerView =
+            albumPhotoRecycler.findViewById<RecyclerView>(R.id.genericRecycler)
+        val noRecordsLayout =
+            albumPhotoRecycler.findViewById<ConstraintLayout>(R.id.noRecordsLayout)
+        if (albumList.isEmpty()) {
+            noRecordsLayout.visibility = View.VISIBLE
+            albumPhotoRecyclerView.visibility = View.GONE
+        } else {
+            noRecordsLayout.visibility = View.GONE
+            albumPhotoRecyclerView.visibility = View.VISIBLE
+            mAlbumsAdapter?.setAlbums(albumList)
+        }
+    }
 
     private fun showProgressBar(progressVisibility: Boolean) {
         if (progressVisibility) albumPhotoProgress.visibility = View.VISIBLE

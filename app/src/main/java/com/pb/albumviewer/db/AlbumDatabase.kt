@@ -1,5 +1,6 @@
 package com.pb.albumviewer.db
 
+import android.app.Application
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -21,10 +22,10 @@ abstract class AlbumDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AlbumDatabase? = null
 
-        fun getInstance(context: Context): AlbumDatabase {
+        fun getInstance(application:Context): AlbumDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance =
-                    Room.databaseBuilder(context.applicationContext, AlbumDatabase::class.java, "album_db")
+                    Room.databaseBuilder(application, AlbumDatabase::class.java, "album_db")
                         .build()
                 INSTANCE = instance
                 instance

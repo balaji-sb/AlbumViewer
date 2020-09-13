@@ -1,5 +1,9 @@
 package com.pb.albumviewer.repository
 
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.pb.albumviewer.base.BaseApplication
 import com.pb.albumviewer.db.AlbumDatabase
 import com.pb.albumviewer.model.response.Albums
@@ -10,13 +14,15 @@ import com.pb.albumviewer.restclient.RetrofitService
  */
 
 
-object AlbumRepository {
+class AlbumRepository(application: Context) {
 
     private var albumApi = RetrofitService.createService(AlbumApi::class.java)
 
-    private var albumDatabase = AlbumDatabase.getInstance(BaseApplication.mContext)
+    private var albumDatabase = AlbumDatabase.getInstance(application)
 
     private val albumDao = albumDatabase.getAlbumsDao()
+
+    private var albumLiveData: List<Albums>? = arrayListOf()
 
     suspend fun fetchPhotosByAlbum(albumId: Int) =
         albumApi.fetchPhotosByAlbum(albumId)
@@ -24,12 +30,13 @@ object AlbumRepository {
     suspend fun fetchAlbums() {
         val albums = albumApi.fetchAlbums()
         albumDao.insertAlbums(albums)
+        albumLiveData = albumDao.getAlbums()
     }
-
-    suspend fun getAlbums() = albumDao.getAlbums()
 
     suspend fun getAlbumsCount() = albumDao.getAlbumsCount()
 
-    suspend fun getAlbumsByTitle(title: String): List<Albums> = albumDao.searchFromAlbum(title)
+    fun getAlbums(): List<Albums> {
+        return albumLiveData!!
+    }
 
 }
